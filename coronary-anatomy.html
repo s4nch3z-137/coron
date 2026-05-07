@@ -735,15 +735,15 @@ function makeVesselsInteractive(svg) {
   let vCount = 0;
   
   paths.forEach(p => {
-    const stroke = p.getAttribute('stroke') || p.style.stroke || '';
-    const fill = p.getAttribute('fill') || p.style.fill || '';
+    const style = p.getAttribute('style') || '';
     
-    if (stroke.includes('#aa0000') || fill.includes('#d16563') || stroke.includes('rgb(170, 0, 0)')) {
-      if (fill.includes('#eaceb7') || fill.includes('#e3d7f4') || fill.includes('#e1a6aa') || fill.includes('#f4a8b4')) return;
+    // Only target actual arteries: they have a red stroke and NO fill.
+    // The heart borders have a fill color (e.g., #eaceb7) and should be ignored.
+    if (style.includes('stroke:#aa0000') && style.includes('fill:none')) {
       if (p.parentNode && p.parentNode.id && p.parentNode.id.includes('layer')) {
         // ok
       } else {
-        // check ancestors
+        // check ancestors for hidden layers
         let curr = p;
         while(curr.parentNode && curr.parentNode.tagName !== 'svg') {
            curr = curr.parentNode;
@@ -768,7 +768,6 @@ function makeVesselsInteractive(svg) {
       hit.addEventListener('mouseleave', onVesLeave);
       hit.addEventListener('click', onVesClick);
       
-      // Insert hit immediately after the vessel path so it inherits the exact same transforms
       p.parentNode.insertBefore(hit, p.nextSibling);
     }
   });
